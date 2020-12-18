@@ -14,7 +14,8 @@ I went with
 ## User setup
 
 * Install "sudo"
-* Add user to the wheel group
+* Create user
+* Make sure user is in the wheel group
 * Allow users in wheel to sudo (via "visudo")
 
 ## Configure pacman 
@@ -22,6 +23,10 @@ I went with
 * Add The color feature
 * Add multilib
 * Add ILoveCandy feature
+
+## Esential packages
+
+    base base-devel git emacs man-db man-pages texinfo
 
 ## Install Nvida and setup
 
