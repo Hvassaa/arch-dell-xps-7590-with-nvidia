@@ -2,6 +2,15 @@
 
 ## Do the normal UEFI installation
 
+I went with 
+
+* 3 partitions
+  - One for boot (/boot)
+  - One for swap
+  - One for root (/)
+* Ext4 for root (and FAT32 for boot)
+* Grub as a bootloader
+
 ## User setup
 
 * Install "sudo"
@@ -44,7 +53,13 @@ The processor supports the RDRAND instruction, so just add the following `random
 
 See https://wiki.archlinux.org/index.php/GDM#Black_screen_on_AMD_or_Intel_GPUs_when_an_NVidia_(e)GPU_is_present
 
-Add `intel_agp i915` modules to the array modules in `/etc/mkinitcpio.conf`. Then regenerate regenerate initramfs:
+Add `intel_agp i915` modules to the array modules in `/etc/mkinitcpio.conf`, so you end up with
+
+    MODULES=(intel_agp i915)
+
+plus whatever else you had before or need.
+
+Then regenerate regenerate initramfs:
 
     # mkinitcpio -P
 
