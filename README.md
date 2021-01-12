@@ -116,13 +116,15 @@ See https://github.com/Askannz/optimus-manager
 ### Usage and gotchas
 
 I have a bug, where I can't switch graphics, unless I first run
-`prime-offload`.
+`prime-offload`. (As of 12th January 2021)
 
 Then you can switch with
 
     optimus-manager --switch intel # for intel graphics
     optimus-manager --switch nvidia # for nvidia graphics
     optimus-manager --switch hybrid # for hybrid graphics
+
+See https://github.com/Askannz/optimus-manager/issues/356
 
 ### Enable runtime PM for nvidia card
 
