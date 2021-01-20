@@ -82,7 +82,7 @@ sustained long-term performance and wear-leveling on SSD:
 
     systemctl enable fstrim.timer
 
-## Optional, install powertop and tlp
+## Optional, install powertop, tlp and thermald
 
 ### Powertop
 
@@ -98,6 +98,10 @@ NetworkManager for this). Then:
 * Enable `NetworkManager-dispatcher.service`
 * Mask `systemd-rfkill.service` and `systemd-rfkill.socket`
 
+### thermald
+
+Install `thermald` and enable it. It helps regulate an Intel cpu's
+temperature. 
 
 ## Optional, use optimus-manager to power card completely down
 
