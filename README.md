@@ -26,19 +26,7 @@ I went with
 
 ## Esential packages
 
-    base base-devel git emacs man-db man-pages texinfo
-
-## Install Nvida and setup
-
-Install nvidia related packages
-
-* nvidia
-* lib32-nvidia-utils
-* nvidia-settings
-* prime-run
-* maybe mesa-demos for glxinfo/glxgears
-
-Now, run `prime-run program` to run a program under the Nvidia card.
+    base base-devel git neovim man-db man-pages
 
 ## Make GDM always use Xorg instead of Wayland
 
@@ -103,7 +91,63 @@ NetworkManager for this). Then:
 Install `thermald` and enable it. It helps regulate an Intel cpu's
 temperature. 
 
-## Optional, use optimus-manager to power card completely down
+## Nvida setup
+
+The goal here is to have a nvidia prime setup. 
+This means the dGPU is powered down, when it is not in use, and is 
+only powered on when you explicitly want it.
+
+### Install these need packages
+Install nvidia related packages
+
+* nvidia
+* lib32-nvidia-utils
+* nvidia-prime
+* optionally, mesa-demos for glxinfo/glxgears
+* optionally, nvidia-settings
+
+### Enable runtime power management for the Nvidia card
+Put the following file content into `/etc/modprobe.d/nvidia.conf`:
+
+```
+options nvidia "NVreg_DynamicPowerManagement=0x02"
+
+# Remove NVIDIA USB xHCI Host Controller devices, if present
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x0c0330", ATTR{remove}="1"
+
+# Remove NVIDIA USB Type-C UCSI devices, if present
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x0c8000", ATTR{remove}="1"
+
+# Remove NVIDIA Audio devices, if present
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x040300", ATTR{remove}="1"
+
+# Enable runtime PM for NVIDIA VGA/3D controller devices on driver bind
+ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="auto"
+ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="auto"
+
+# Disable runtime PM for NVIDIA VGA/3D controller devices on driver unbind
+ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="on"
+ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="on"
+
+blacklist nouveau
+```
+
+### Launch programs with Nvidia
+Now, run `prime-run program` to run a program under the Nvidia card.
+
+### Check that it worked
+Check that 
+```
+cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status
+```
+returns `suspended`, when you are not running anything under the dGPU.
+```
+cat /proc/driver/nvidia/gpus/*/power
+```
+Should return `Runtime D3 status:          Enabled (fine-grained)`
+
+
+## (OLD VERSION, I think it is better to use the official nvidia prime offload) Optional, use optimus-manager to power card completely down
 
 ### (Maybe install `yay`)
 
