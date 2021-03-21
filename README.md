@@ -107,11 +107,13 @@ Install nvidia related packages
 * optionally, nvidia-settings
 
 ### Enable runtime power management for the Nvidia card
-Put the following file content into `/etc/modprobe.d/nvidia.conf`:
+Put the following into `/etc/modprobe.d/nvidia.conf`:
 
 ```
 options nvidia "NVreg_DynamicPowerManagement=0x02"
-
+```
+and this into `/lib/udev/rules.d/80-nvidia-pm.rules`
+```
 # Remove NVIDIA USB xHCI Host Controller devices, if present
 ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x0c0330", ATTR{remove}="1"
 
@@ -132,6 +134,18 @@ ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x0302
 blacklist nouveau
 ```
 
+### Set tlp to always enable runtime power management
+It seems tlp normally disables runtime pm when on AC. 
+This can be fixed with these two lines in the config (`/etc/tlp.conf`):
+```
+RUNTIME_PM_ON_AC=auto
+RUNTIME_PM_ON_BAT=auto
+```
+This might also be needed, haven't tested it through:
+```
+RUNTIME_PM_DRIVER_BLACKLIST="mei_me"
+```
+
 ### Launch programs with Nvidia
 Now, run `prime-run program` to run a program under the Nvidia card.
 
@@ -145,6 +159,9 @@ returns `suspended`, when you are not running anything under the dGPU.
 cat /proc/driver/nvidia/gpus/*/power
 ```
 Should return `Runtime D3 status:          Enabled (fine-grained)`
+
+Finally, check the power draw via `# powertop` while on battery and no peripherals connected. 
+It should be ~2W (at least for me).
 
 
 ## (OLD VERSION, I think it is better to use the official nvidia prime offload) Optional, use optimus-manager to power card completely down
