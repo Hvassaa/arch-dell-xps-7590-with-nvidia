@@ -17,6 +17,8 @@
     + [Setup kernel parameters in grub](#setup-kernel-parameters-in-grub)
     + [Add hook to mkinitcpio](#add-hook-to-mkinitcpio)
     + [Hibernate](#hibernate)
+  * [Desktop setup](#desktop-setup)
+    + [Adjust xdg-mime](#adjust-xdg-mime)
   * [Nvida setup](#nvida-setup)
     + [Install these need packages](#install-these-need-packages)
     + [Enable runtime power management for the Nvidia card](#enable-runtime-power-management-for-the-nvidia-card)
@@ -143,6 +145,19 @@ Regenerate the initramfs:
 
 ### Hibernate
 Hibernate with `systemctl hibernate`
+
+
+## Desktop setup
+
+### Adjust xdg-mime
+See 
+https://wiki.archlinux.org/index.php/Xdg-utils
+
+Install `xdg-utils`, then something like the following should be sufficient:
+```
+xdg-settings set default-web-browser firefox.desktop
+xdg-mime default evince.desktop application/pdf
+```
 
 ## Nvida setup
 
