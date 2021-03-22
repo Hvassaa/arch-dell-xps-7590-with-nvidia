@@ -85,11 +85,35 @@ NetworkManager for this). Then:
 
 * Enable `NetworkManager-dispatcher.service`
 * Mask `systemd-rfkill.service` and `systemd-rfkill.socket`
+* (See under the Nvidia section for always enables runtime pm)
 
 ### thermald
 
 Install `thermald` and enable it. It helps regulate an Intel cpu's
 temperature. 
+
+## Setup hibernation
+See 
+https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate
+
+### Setup kernel parameters in grub
+Add `resume=UUID=uuid-of-my-swap-partition` (check `/etc/fstab`). Regenerate the grub config:
+```
+# grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+### Add hook to mkinitcpio
+Add `resume` to hooks under `/etc/mkinitcpio.conf`. The line should look something like
+```
+HOOKS=(base udev autodetect modconf block filesystems keyboard resume fsck)
+```
+Regenerate the initramfs:
+```
+# mkinitcpio -P
+```
+
+### Hibernate
+Hibernate with `systemctl hibernate`
 
 ## Nvida setup
 
@@ -111,6 +135,7 @@ Put the following into `/etc/modprobe.d/nvidia.conf`:
 
 ```
 options nvidia "NVreg_DynamicPowerManagement=0x02"
+blacklist nouveau
 ```
 and this into `/lib/udev/rules.d/80-nvidia-pm.rules`
 ```
@@ -130,8 +155,6 @@ ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200
 # Disable runtime PM for NVIDIA VGA/3D controller devices on driver unbind
 ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="on"
 ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="on"
-
-blacklist nouveau
 ```
 
 ### Set tlp to always enable runtime power management
